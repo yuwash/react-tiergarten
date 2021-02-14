@@ -25,21 +25,23 @@ const inverseMatrix = [  // only works for the default config
   [-3, 0.5, 1],
 ];
 
+const fixValue = value => (
+  (value < 0) ? 0 : Math.floor(value)
+);
+
 const guessCounts = values => Object.fromEntries(
   // order of participantTypes and materials is important
   Array.from(["rabbit", "cricket", "octopus"].entries()).map(
-    ([i, participantType]) => {
-      const row = inverseMatrix[i];
-      const sum = Array.from(
-        [values.persons, values.legs, values.shirts].entries()
-      ).reduce(
-        (sum_, [j, val]) => sum_ + val * row[j],
-        0);
-      return [
-        participantType,
-        sum < 0 ? 0 : Math.floor(sum)
-      ];
-    }
+    ([i, participantType]) => [
+      participantType,
+      fixValue(
+        Array.from(
+          [values.persons, values.legs, values.shirts].entries()
+        ).reduce(
+          (sum_, [j, val]) => sum_ + val * inverseMatrix[i][j],
+          0)
+      )
+    ]
   )
 );
 
@@ -86,9 +88,8 @@ const GuessCountsForm = props => {
   );
 };
 
-const Tiergarten = props => {
-  const participantTypes = props.config.participantTypes;
-  const materialCounts = Object.entries(props.state).reduce(
+const getMaterialCounts = (state, participantTypes) => (
+  Object.entries(state).reduce(
     (result, [participantType, count]) => ({
       persons: result.persons + (count || 0),
       legs: result.legs + (
@@ -98,7 +99,12 @@ const Tiergarten = props => {
           participantTypes[participantType].requirements.shirts * count || 0)
     }),
     { persons: 0, legs: 0, shirts: 0 }
-  );
+  )
+);
+
+const Tiergarten = props => {
+  const participantTypes = props.config.participantTypes;
+  const materialCounts = getMaterialCounts(props.state, participantTypes);
   const participantPropsByType = {
     rabbit: { onClick: props.handleDelete("rabbit") },
     cricket: { onClick: props.handleDelete("cricket") },
