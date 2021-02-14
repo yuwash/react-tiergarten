@@ -1,13 +1,90 @@
-import React from "react";
+import React, { useState } from "react";
 
 const makeParticipantsForType = (participantType, count, typeConfig, props) =>
-  Array(count)
-    .fill(null, 0, count)
-    .map(() => (
-      <a data-tooltip="entfernen" {...props} alt={typeConfig.label}>
+  Array.from(Array(count).entries()).map(
+    ([key, __]) => (
+      <a
+        key={participantType + key}
+        data-tooltip="entfernen"
+        alt={typeConfig.label}
+        {...props}
+      >
         {typeConfig.emoji}
       </a>
     ));
+
+const materialNames = {
+  persons: "Stirnbänder",
+  legs: "Socken",
+  shirts: "T-Shirts (leider nur für Hasen)"
+};
+
+const inverseMatrix = [  // only works for the default config
+  [0, 0, 1],
+  [4, -0.5, -2],
+  [-3, 0.5, 1],
+];
+
+const guessCounts = values => Object.fromEntries(
+  // order of participantTypes and materials is important
+  Array.from(["rabbit", "cricket", "octopus"].entries()).map(
+    ([i, participantType]) => {
+      const row = inverseMatrix[i];
+      const sum = Array.from(
+        [values.persons, values.legs, values.shirts].entries()
+      ).reduce(
+        (sum_, [j, val]) => sum_ + val * row[j],
+        0);
+      return [
+        participantType,
+        sum < 0 ? 0 : Math.floor(sum)
+      ];
+    }
+  )
+);
+
+const GuessCountsForm = props => {
+  const [values, setValues] = useState(() => Object.fromEntries(
+    Object.keys(materialNames).map(material => [material, ""])
+  ));
+
+  const handleChange = event => {
+    const newValues = Object.assign({}, values);
+    newValues[event.target.name] = event.target.value;
+    setValues(newValues);
+  };
+
+  const handleSubmit = event => {
+    const guessedCounts = guessCounts(values);
+    console.log("submit", values, guessedCounts);
+    props.updateValues(guessedCounts);
+    event.preventDefault();
+  };
+
+  return (
+    <form class="ui form" onSubmit={handleSubmit}>
+      <div class="fields">{
+        Object.entries(values).map(([material, count]) => (
+          <div class="field" key={material}>
+            <label>{materialNames[material]}</label>
+            <input
+              type="number"
+              min="0"
+              required
+              name={material}
+              placeholder={props.materialCounts[material]}
+              value={count}
+              onChange={handleChange}
+            />
+          </div>
+        ))
+      }</div>
+      <button class="ui button" type="submit">
+        Teilnehmer*innenzahlen erraten
+      </button>
+    </form>
+  );
+};
 
 const Tiergarten = props => {
   const participantTypes = props.config.participantTypes;
@@ -47,12 +124,21 @@ const Tiergarten = props => {
           <div class="tiergarten">{content}</div>
         </div>
         <div class="content">
-          <a class="header">Benötigte Materialien</a>
-          <div class="extra content">{materialCounts.persons} Stirnbänder</div>
-          <div class="extra content">{materialCounts.legs} Socken</div>
-          <div class="extra content">
-            {materialCounts.shirts} T-Shirts (leider nur für Hasen)
-          </div>
+          <h2 class="header">Benötigte Materialien</h2>
+          {
+            Object.entries(materialCounts).map(([material, count]) => (
+              <div class="extra content" key={material}>
+                {count} {materialNames[material]}
+              </div>
+            ))
+          }
+        </div>
+        <div class="content">
+          <h2 class="header">Materialien schon da?</h2>
+          <GuessCountsForm
+            materialCounts={materialCounts}
+            updateValues={props.updateValues}
+          />
         </div>
       </div>
     </>

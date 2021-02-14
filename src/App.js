@@ -13,6 +13,9 @@ const buildInitialState = (config) => Object.fromEntries(
 const reducer = (state, action) => {
   const nextState = Object.assign({}, state);
   switch(action.type) {
+    case "update":
+      Object.assign(nextState, action.values);
+      return nextState;
     case "add":
       nextState[action.participantType] += 1;
       return nextState;
@@ -25,6 +28,9 @@ const reducer = (state, action) => {
 const App = () => {
   const [config, setConfig] = useState(initialConfig);
   const [state, dispatch] = useReducer(reducer, config, buildInitialState);
+  const updateValues = values => {
+    dispatch({ type: "update", values })
+  };
   const handleAdd = participantType => event => {
     dispatch({ type: "add", participantType });
     console.log(state);
@@ -41,7 +47,12 @@ const App = () => {
         kommen!
       </p>
       <EditMenu config={config} handleClick={handleAdd} />
-      <Tiergarten config={config} state={state} handleDelete={handleDelete} />
+      <Tiergarten
+        config={config}
+        state={state}
+        updateValues={updateValues}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };
