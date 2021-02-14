@@ -1,25 +1,35 @@
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 import EditMenu from "./EditMenu";
 import Tiergarten from "./Tiergarten";
 import "./style.css";
 import "fomantic-ui-css/semantic.css";
 
+const initialState = {
+  rabbit: 0,
+  cricket: 0,
+  octopus: 0
+};
+
+const reducer = (state, action) => {
+  const nextState = Object.assign({}, state);
+  switch(action.type) {
+    case "add":
+      nextState[action.participantType] += 1;
+      return nextState;
+    case "delete":
+      nextState[action.participantType] -= 1;
+      return nextState;
+  }
+};
+
 const App = () => {
-  const state = {
-    rabbit: useState(0),
-    cricket: useState(0),
-    octopus: useState(0)
-  };
+  const [state, dispatch] = useReducer(reducer, initialState);
   const handleAdd = participantType => event => {
-    const [count, setCount] = state[participantType];
-    const newCount = (state[participantType][0] = count + 1);
-    setCount(newCount);
+    dispatch({ type: "add", participantType });
     console.log(state);
   };
   const handleDelete = participantType => event => {
-    const [count, setCount] = state[participantType];
-    const newCount = (state[participantType][0] = count - 1);
-    setCount(newCount);
+    dispatch({ type: "delete", participantType });
     console.log(state);
   };
   return (

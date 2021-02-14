@@ -28,7 +28,7 @@ const makeParticipantsForType = (participantType, count, props) =>
 
 const Tiergarten = props => {
   const materialCounts = Object.entries(props.state).reduce(
-    (result, [participantType, [count, setCount]]) => ({
+    (result, [participantType, count]) => ({
       persons: result.persons + (count || 0),
       legs: result.legs + (participantTypes[participantType].legs * count || 0),
       shirts:
@@ -42,7 +42,7 @@ const Tiergarten = props => {
     octopus: { onClick: props.handleDelete("octopus") }
   };
   const participants = Object.entries(props.state).reduce(
-    (result, [participantType, [count, setCount]]) =>
+    (result, [participantType, count]) =>
       result.concat(
         makeParticipantsForType(
           participantType,
