@@ -24,7 +24,7 @@ const emojiByType = {
 const makeParticipantsForType = (participantType, count, props) =>
   Array(count)
     .fill(null, 0, count)
-    .map(() => <a title="entfernen" {...props}>{emojiByType[participantType]}</a>);
+    .map(() => <a data-tooltip="entfernen" {...props}>{emojiByType[participantType]}</a>);
 
 const Tiergarten = props => {
   const materialCounts = Object.entries(props.state).reduce(

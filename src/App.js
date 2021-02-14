@@ -23,9 +23,9 @@ const App = () => {
     console.log(state);
   };
   return (
-    <div>
-      <h1>Tiergarten</h1>
-      <p>
+    <div className="ui container">
+      <h1 className="ui header">Tiergarten</h1>
+      <p className="ui info message">
         Klick auf die Teilnehmer*innen-Knöpfe, damit sie in den Tiergarten
         kommen!
       </p>
