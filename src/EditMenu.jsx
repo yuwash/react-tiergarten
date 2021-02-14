@@ -5,19 +5,19 @@ const LargeEmoji = ({children}) => (
 )
 
 const EditMenu = (props) => (
-  <div class="ui labeled icon compact menu">
-    <a class="item add-rabbit" onClick={props.handleClick("rabbit")}>
-      <LargeEmoji>🐇</LargeEmoji>
-      Hase
-    </a>
-    <a class="item add-cricket" onClick={props.handleClick("cricket")}>
-      <LargeEmoji>🦗</LargeEmoji>
-      Grille
-    </a>
-    <a class="item add-octopus" onClick={props.handleClick("octopus")}>
-      <LargeEmoji>🐙</LargeEmoji>
-      Oktopus
-    </a>
-  </div>
+  <div className="ui labeled icon compact menu">{
+    Object.entries(props.config.participantTypes)
+    .map(([participantType, typeConfig]) => (
+      <a
+        key={participantType}
+        class="item add-{participantType}"
+        onClick={props.handleClick(participantType)}
+      >
+        <LargeEmoji>{typeConfig.emoji}</LargeEmoji>
+        {typeConfig.label}
+      </a>
+    ))
+  }</div>
 );
+
 export default EditMenu;

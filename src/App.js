@@ -1,14 +1,14 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useState } from "react";
 import EditMenu from "./EditMenu";
+import initialConfig from "./initialConfig";
 import Tiergarten from "./Tiergarten";
 import "./style.css";
 import "fomantic-ui-css/semantic.css";
 
-const initialState = {
-  rabbit: 0,
-  cricket: 0,
-  octopus: 0
-};
+const buildInitialState = (config) => Object.fromEntries(
+  Object.keys(config.participantTypes)
+  .map(participantType => [participantType, 0])
+);
 
 const reducer = (state, action) => {
   const nextState = Object.assign({}, state);
@@ -23,7 +23,8 @@ const reducer = (state, action) => {
 };
 
 const App = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [config, setConfig] = useState(initialConfig);
+  const [state, dispatch] = useReducer(reducer, config, buildInitialState);
   const handleAdd = participantType => event => {
     dispatch({ type: "add", participantType });
     console.log(state);
@@ -39,8 +40,8 @@ const App = () => {
         Klick auf die Teilnehmer*innen-Knöpfe, damit sie in den Tiergarten
         kommen!
       </p>
-      <EditMenu handleClick={handleAdd} />
-      <Tiergarten state={state} handleDelete={handleDelete} />
+      <EditMenu config={config} handleClick={handleAdd} />
+      <Tiergarten config={config} state={state} handleDelete={handleDelete} />
     </div>
   );
 };

@@ -1,38 +1,24 @@
 import React from "react";
 
-const participantTypes = {
-  rabbit: {
-    legs: 4,
-    shirts: 1
-  },
-  cricket: {
-    legs: 6,
-    shirts: 0
-  },
-  octopus: {
-    legs: 8,
-    shirts: 0
-  }
-};
-
-const emojiByType = {
-  rabbit: "🐇",
-  cricket: "🦗",
-  octopus: "🐙"
-};
-
-const makeParticipantsForType = (participantType, count, props) =>
+const makeParticipantsForType = (participantType, count, typeConfig, props) =>
   Array(count)
     .fill(null, 0, count)
-    .map(() => <a data-tooltip="entfernen" {...props}>{emojiByType[participantType]}</a>);
+    .map(() => (
+      <a data-tooltip="entfernen" {...props} alt={typeConfig.label}>
+        {typeConfig.emoji}
+      </a>
+    ));
 
 const Tiergarten = props => {
+  const participantTypes = props.config.participantTypes;
   const materialCounts = Object.entries(props.state).reduce(
     (result, [participantType, count]) => ({
       persons: result.persons + (count || 0),
-      legs: result.legs + (participantTypes[participantType].legs * count || 0),
+      legs: result.legs + (
+        participantTypes[participantType].requirements.legs * count || 0),
       shirts:
-        result.shirts + (participantTypes[participantType].shirts * count || 0)
+        result.shirts + (
+          participantTypes[participantType].requirements.shirts * count || 0)
     }),
     { persons: 0, legs: 0, shirts: 0 }
   );
@@ -47,6 +33,7 @@ const Tiergarten = props => {
         makeParticipantsForType(
           participantType,
           count,
+          participantTypes[participantType],
           participantPropsByType[participantType]
         )
       ),
