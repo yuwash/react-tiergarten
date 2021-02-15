@@ -1,24 +1,24 @@
 {
   "files": {
     "main.css": "/react-tiergarten/static/css/main.288c8fa1.chunk.css",
-    "main.js": "/react-tiergarten/static/js/main.6d440ad4.chunk.js",
-    "main.js.map": "/react-tiergarten/static/js/main.6d440ad4.chunk.js.map",
+    "main.js": "/react-tiergarten/static/js/main.16937bf3.chunk.js",
+    "main.js.map": "/react-tiergarten/static/js/main.16937bf3.chunk.js.map",
     "runtime-main.js": "/react-tiergarten/static/js/runtime-main.eca628dc.js",
     "runtime-main.js.map": "/react-tiergarten/static/js/runtime-main.eca628dc.js.map",
     "static/css/2.0ad80daa.chunk.css": "/react-tiergarten/static/css/2.0ad80daa.chunk.css",
-    "static/js/2.d787cfe7.chunk.js": "/react-tiergarten/static/js/2.d787cfe7.chunk.js",
-    "static/js/2.d787cfe7.chunk.js.map": "/react-tiergarten/static/js/2.d787cfe7.chunk.js.map",
+    "static/js/2.90693694.chunk.js": "/react-tiergarten/static/js/2.90693694.chunk.js",
+    "static/js/2.90693694.chunk.js.map": "/react-tiergarten/static/js/2.90693694.chunk.js.map",
     "index.html": "/react-tiergarten/index.html",
     "static/css/2.0ad80daa.chunk.css.map": "/react-tiergarten/static/css/2.0ad80daa.chunk.css.map",
     "static/css/main.288c8fa1.chunk.css.map": "/react-tiergarten/static/css/main.288c8fa1.chunk.css.map",
-    "static/js/2.d787cfe7.chunk.js.LICENSE.txt": "/react-tiergarten/static/js/2.d787cfe7.chunk.js.LICENSE.txt",
+    "static/js/2.90693694.chunk.js.LICENSE.txt": "/react-tiergarten/static/js/2.90693694.chunk.js.LICENSE.txt",
     "static/media/semantic.css": "/react-tiergarten/static/media/outline-icons.f4f60ace.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.eca628dc.js",
     "static/css/2.0ad80daa.chunk.css",
-    "static/js/2.d787cfe7.chunk.js",
+    "static/js/2.90693694.chunk.js",
     "static/css/main.288c8fa1.chunk.css",
-    "static/js/main.6d440ad4.chunk.js"
+    "static/js/main.16937bf3.chunk.js"
   ]
 }
