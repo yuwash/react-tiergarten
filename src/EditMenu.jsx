@@ -10,11 +10,14 @@ const EditMenu = (props) => (
     .map(([participantType, typeConfig]) => (
       <a
         key={participantType}
-        class="item add-{participantType}"
+        className={`item add-{participantType}`}
         onClick={props.handleClick(participantType)}
       >
         <LargeEmoji>{typeConfig.emoji}</LargeEmoji>
         {typeConfig.label}
+        <div className="ui top right attached label">
+          {props.state[participantType]}
+        </div>
       </a>
     ))
   }</div>

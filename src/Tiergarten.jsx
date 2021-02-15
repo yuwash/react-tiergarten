@@ -133,9 +133,14 @@ const Tiergarten = props => {
           <h2 class="header">Benötigte Materialien</h2>
           {
             Object.entries(materialCounts).map(([material, count]) => (
-              <div class="extra content" key={material}>
-                {count} {materialNames[material]}
-              </div>
+                <div class="ui tiny horizontal statistic" key={material}>
+                  <div class="value">
+                    {count}
+                  </div>
+                  <div class="label">
+                    {materialNames[material]}
+                  </div>
+                </div>
             ))
           }
         </div>

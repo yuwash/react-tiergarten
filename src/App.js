@@ -46,7 +46,11 @@ const App = () => {
         Klick auf die Teilnehmer*innen-Knöpfe, damit sie in den Tiergarten
         kommen!
       </p>
-      <EditMenu config={config} handleClick={handleAdd} />
+      <EditMenu
+        config={config}
+        state={state}
+        handleClick={handleAdd}
+      />
       <Tiergarten
         config={config}
         state={state}
