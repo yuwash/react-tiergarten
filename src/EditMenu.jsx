@@ -5,7 +5,7 @@ const LargeEmoji = ({children}) => (
 )
 
 const EditMenu = (props) => (
-  <div className="ui labeled icon compact menu">{
+  <div className="ui labeled icon menu">{
     Object.entries(props.config.participantTypes)
     .map(([participantType, typeConfig]) => (
       <a

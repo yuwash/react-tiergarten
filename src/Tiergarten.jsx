@@ -19,12 +19,8 @@ const materialNames = {
   shirts: "T-Shirts (leider nur für Hasen)"
 };
 
-const inverseMatrix = [
-  // only works for the default config
-  [0, 0, 1],
-  [4, -0.5, -2],
-  [-3, 0.5, 1]
-];
+const materialKeysVector = ["persons", "legs", "shirts"];
+const participantTypeKeysVector = ["rabbit", "cricket", "octopus"];
 
 const materialsVectorToValues = ([persons, legs, shirts]) => ({
   persons,
@@ -52,17 +48,17 @@ const stateToParticipantsVector = state => jStat([
 
 const participantTypesToMatrix = participantTypes =>
   jStat(
-    ["rabbit", "cricket", "octopus"].map(participantType => {
+    participantTypeKeysVector.map(participantType => {
       const requirements = participantTypes[participantType].requirements;
-      return ["persons", "legs", "shirts"].map(material =>
+      return materialKeysVector.map(material =>
         material === "persons" ? 1 : requirements[material]
       );
     })
   ).transpose();
 
-const fixValue = value => (value < 0 ? 0 : Math.floor(value));
+const fixValue = value => (value < 0 ? 0 : Math.round(value));
 
-const guessCounts = values =>
+const guessCounts = (values, inverseMatrix) =>
   participantsVectorToState(
     jStat(inverseMatrix)
       .multiply(valuesToMaterialsVector(values))
@@ -84,7 +80,7 @@ const GuessCountsForm = props => {
   };
 
   const handleSubmit = event => {
-    const guessedCounts = guessCounts(values);
+    const guessedCounts = guessCounts(values, props.inverseMatrix);
     console.log("submit", values, guessedCounts);
     props.updateValues(guessedCounts);
     event.preventDefault();
@@ -127,11 +123,12 @@ const Tiergarten = props => {
   const participantTypes = props.config.participantTypes;
   console.log("mat", participantTypesToMatrix(participantTypes));
   const materialCounts = getMaterialCounts(props.state, participantTypes);
-  const participantPropsByType = {
-    rabbit: { onClick: props.handleDelete("rabbit") },
-    cricket: { onClick: props.handleDelete("cricket") },
-    octopus: { onClick: props.handleDelete("octopus") }
-  };
+  const participantPropsByType = Object.fromEntries(
+    participantTypeKeysVector.map(participantType => [
+      [participantType],
+      { onClick: props.handleDelete(participantType) },
+    ])
+  );
   const participants = Object.entries(props.state).reduce(
     (result, [participantType, count]) =>
       result.concat(
@@ -145,6 +142,12 @@ const Tiergarten = props => {
     []
   );
   const content = participants.length ? participants : "leerer Tiergarten…";
+  const requirementsMatrixJ = participantTypesToMatrix(participantTypes);
+  const requirementsMatrix = requirementsMatrixJ.toArray();
+  const inverseMatrix = jStat.inv(requirementsMatrixJ);
+  const roundAt = (x, decimals) => (
+    Math.pow(10, -decimals) * Math.round(Math.pow(10, decimals) * x)
+  );
   return (
     <>
       <div class="ui card">
@@ -165,7 +168,27 @@ const Tiergarten = props => {
           <GuessCountsForm
             materialCounts={materialCounts}
             updateValues={props.updateValues}
+            inverseMatrix={inverseMatrix}
           />
+        </div>
+      </div>
+      <div className="ui card">
+        <div class="content">
+          <h2 className="header">Materialien-Matrix</h2>
+          <table className="ui celled table">
+            <thead><tr>{participantTypeKeysVector.map(participantType => (
+              <th>je {participantTypes[participantType].label}</th>
+            ))}</tr></thead>
+            <tbody>{ requirementsMatrix.map(row => (
+              <tr>{row.map(col => <td>{roundAt(col, 2)}</td>)}</tr>
+            )) }</tbody>
+          </table>
+        </div>
+        <div class="content">
+          <h2 className="header">Inverse Matrix</h2>
+          <table className="ui celled table"><tbody>{inverseMatrix.map(row => (
+            <tr>{row.map(col => <td>{roundAt(col, 2)}</td>)}</tr>
+          ))}</tbody></table>
         </div>
       </div>
     </>

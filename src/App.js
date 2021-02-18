@@ -51,12 +51,14 @@ const App = () => {
         state={state}
         handleClick={handleAdd}
       />
-      <Tiergarten
-        config={config}
-        state={state}
-        updateValues={updateValues}
-        handleDelete={handleDelete}
-      />
+      <div className="ui cards">
+        <Tiergarten
+          config={config}
+          state={state}
+          updateValues={updateValues}
+          handleDelete={handleDelete}
+        />
+      </div>
     </div>
   );
 };
