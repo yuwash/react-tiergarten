@@ -32,11 +32,11 @@ const materialsVectorToValues = ([persons, legs, shirts]) => ({
   shirts
 });
 
-const valuesToMaterialsVector = values => [
+const valuesToMaterialsVector = values => jStat([
   values.persons,
   values.legs,
   values.shirts
-];
+]).transpose();
 
 const participantsVectorToState = ([rabbit, cricket, octopus]) => ({
   rabbit,
@@ -120,6 +120,7 @@ const getMaterialCounts = (state, participantTypes) =>
     participantTypesToMatrix(participantTypes)
       .multiply(stateToParticipantsVector(state))
       .toArray()
+      .map(Math.floor)
   );
 
 const Tiergarten = props => {
