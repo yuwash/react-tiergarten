@@ -1,17 +1,17 @@
 import React, { useState } from "react";
+import { jStat } from "jstat";
 
 const makeParticipantsForType = (participantType, count, typeConfig, props) =>
-  Array.from(Array(count).entries()).map(
-    ([key, __]) => (
-      <a
-        key={participantType + key}
-        data-tooltip="entfernen"
-        alt={typeConfig.label}
-        {...props}
-      >
-        {typeConfig.emoji}
-      </a>
-    ));
+  Array.from(Array(count).entries()).map(([key, __]) => (
+    <a
+      key={participantType + key}
+      data-tooltip="entfernen"
+      alt={typeConfig.label}
+      {...props}
+    >
+      {typeConfig.emoji}
+    </a>
+  ));
 
 const materialNames = {
   persons: "Stirnbänder",
@@ -19,36 +19,63 @@ const materialNames = {
   shirts: "T-Shirts (leider nur für Hasen)"
 };
 
-const inverseMatrix = [  // only works for the default config
+const inverseMatrix = [
+  // only works for the default config
   [0, 0, 1],
   [4, -0.5, -2],
-  [-3, 0.5, 1],
+  [-3, 0.5, 1]
 ];
 
-const fixValue = value => (
-  (value < 0) ? 0 : Math.floor(value)
-);
+const materialsVectorToValues = ([persons, legs, shirts]) => ({
+  persons,
+  legs,
+  shirts
+});
 
-const guessCounts = values => Object.fromEntries(
-  // order of participantTypes and materials is important
-  Array.from(["rabbit", "cricket", "octopus"].entries()).map(
-    ([i, participantType]) => [
-      participantType,
-      fixValue(
-        Array.from(
-          [values.persons, values.legs, values.shirts].entries()
-        ).reduce(
-          (sum_, [j, val]) => sum_ + val * inverseMatrix[i][j],
-          0)
-      )
-    ]
-  )
-);
+const valuesToMaterialsVector = values => [
+  values.persons,
+  values.legs,
+  values.shirts
+];
+
+const participantsVectorToState = ([rabbit, cricket, octopus]) => ({
+  rabbit,
+  cricket,
+  octopus
+});
+
+const stateToParticipantsVector = state => jStat([
+  state.rabbit,
+  state.cricket,
+  state.octopus
+]).transpose();
+
+const participantTypesToMatrix = participantTypes =>
+  jStat(
+    ["rabbit", "cricket", "octopus"].map(participantType => {
+      const requirements = participantTypes[participantType].requirements;
+      return ["persons", "legs", "shirts"].map(material =>
+        material === "persons" ? 1 : requirements[material]
+      );
+    })
+  ).transpose();
+
+const fixValue = value => (value < 0 ? 0 : Math.floor(value));
+
+const guessCounts = values =>
+  participantsVectorToState(
+    jStat(inverseMatrix)
+      .multiply(valuesToMaterialsVector(values))
+      .toArray()
+      .map(fixValue)
+  );
 
 const GuessCountsForm = props => {
-  const [values, setValues] = useState(() => Object.fromEntries(
-    Object.keys(materialNames).map(material => [material, ""])
-  ));
+  const [values, setValues] = useState(() =>
+    Object.fromEntries(
+      Object.keys(materialNames).map(material => [material, ""])
+    )
+  );
 
   const handleChange = event => {
     const newValues = Object.assign({}, values);
@@ -65,8 +92,8 @@ const GuessCountsForm = props => {
 
   return (
     <form class="ui form" onSubmit={handleSubmit}>
-      <div class="fields">{
-        Object.entries(values).map(([material, count]) => (
+      <div class="fields">
+        {Object.entries(values).map(([material, count]) => (
           <div class="field" key={material}>
             <label>{materialNames[material]}</label>
             <input
@@ -79,8 +106,8 @@ const GuessCountsForm = props => {
               onChange={handleChange}
             />
           </div>
-        ))
-      }</div>
+        ))}
+      </div>
       <button class="ui button" type="submit">
         Teilnehmer*innenzahlen erraten
       </button>
@@ -88,22 +115,16 @@ const GuessCountsForm = props => {
   );
 };
 
-const getMaterialCounts = (state, participantTypes) => (
-  Object.entries(state).reduce(
-    (result, [participantType, count]) => ({
-      persons: result.persons + (count || 0),
-      legs: result.legs + (
-        participantTypes[participantType].requirements.legs * count || 0),
-      shirts:
-        result.shirts + (
-          participantTypes[participantType].requirements.shirts * count || 0)
-    }),
-    { persons: 0, legs: 0, shirts: 0 }
-  )
-);
+const getMaterialCounts = (state, participantTypes) =>
+  materialsVectorToValues(
+    participantTypesToMatrix(participantTypes)
+      .multiply(stateToParticipantsVector(state))
+      .toArray()
+  );
 
 const Tiergarten = props => {
   const participantTypes = props.config.participantTypes;
+  console.log("mat", participantTypesToMatrix(participantTypes));
   const materialCounts = getMaterialCounts(props.state, participantTypes);
   const participantPropsByType = {
     rabbit: { onClick: props.handleDelete("rabbit") },
@@ -131,18 +152,12 @@ const Tiergarten = props => {
         </div>
         <div class="content">
           <h2 class="header">Benötigte Materialien</h2>
-          {
-            Object.entries(materialCounts).map(([material, count]) => (
-                <div class="ui tiny horizontal statistic" key={material}>
-                  <div class="value">
-                    {count}
-                  </div>
-                  <div class="label">
-                    {materialNames[material]}
-                  </div>
-                </div>
-            ))
-          }
+          {Object.entries(materialCounts).map(([material, count]) => (
+            <div class="ui tiny horizontal statistic" key={material}>
+              <div class="value">{count}</div>
+              <div class="label">{materialNames[material]}</div>
+            </div>
+          ))}
         </div>
         <div class="content">
           <h2 class="header">Materialien schon da?</h2>
