@@ -22,29 +22,18 @@ const materialNames = {
 const materialKeysVector = ["persons", "legs", "shirts"];
 const participantTypeKeysVector = ["rabbit", "cricket", "octopus"];
 
-const materialsVectorToValues = ([persons, legs, shirts]) => ({
-  persons,
-  legs,
-  shirts
-});
+const vectorToValues = keysVector => vector => Object.fromEntries(
+  Array.from(keysVector.entries()).map(([i, key]) => [key, vector[i]])
+);
 
-const valuesToMaterialsVector = values => jStat([
-  values.persons,
-  values.legs,
-  values.shirts
-]).transpose();
+const valuesToVector = keysVector => values => jStat(keysVector.map(
+  key => values[key])).transpose();
 
-const participantsVectorToState = ([rabbit, cricket, octopus]) => ({
-  rabbit,
-  cricket,
-  octopus
-});
+const materialsVectorToValues = vectorToValues(materialKeysVector);
+const valuesToMaterialsVector = valuesToVector(materialKeysVector);
 
-const stateToParticipantsVector = state => jStat([
-  state.rabbit,
-  state.cricket,
-  state.octopus
-]).transpose();
+const participantsVectorToState = vectorToValues(participantTypeKeysVector);
+const stateToParticipantsVector = valuesToVector(participantTypeKeysVector);
 
 const participantTypesToMatrix = participantTypes =>
   jStat(
