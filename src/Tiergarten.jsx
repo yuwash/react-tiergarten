@@ -175,7 +175,7 @@ const Tiergarten = props => {
       <div className="ui card">
         <div class="content">
           <h2 className="header">Materialien-Matrix</h2>
-          <table className="ui celled table">
+          <table className="ui celled unstackable table">
             <thead><tr>{participantTypeKeysVector.map(participantType => (
               <th>je {participantTypes[participantType].label}</th>
             ))}</tr></thead>
@@ -186,7 +186,7 @@ const Tiergarten = props => {
         </div>
         <div class="content">
           <h2 className="header">Inverse Matrix</h2>
-          <table className="ui celled table"><tbody>{inverseMatrix.map(row => (
+          <table className="ui celled unstackable table"><tbody>{inverseMatrix.map(row => (
             <tr>{row.map(col => <td>{roundAt(col, 2)}</td>)}</tr>
           ))}</tbody></table>
         </div>
