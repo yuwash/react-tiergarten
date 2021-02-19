@@ -4,6 +4,7 @@ const initialConfig = {
       label: "Hase",
       emoji: "🐇",
       requirements: {
+        heads: 1,
         legs: 4,
         shirts: 1
       }
@@ -12,6 +13,7 @@ const initialConfig = {
       label: "Grille",
       emoji: "🦗",
       requirements: {
+        heads: 1,
         legs: 6,
         shirts: 0
       }
@@ -20,6 +22,7 @@ const initialConfig = {
       label: "Oktopus",
       emoji: "🐙",
       requirements: {
+        heads: 1,
         legs: 8,
         shirts: 0
       }

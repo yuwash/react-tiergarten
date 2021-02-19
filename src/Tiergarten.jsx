@@ -14,12 +14,12 @@ const makeParticipantsForType = (participantType, count, typeConfig, props) =>
   ));
 
 const materialNames = {
-  persons: "Stirnbänder",
+  heads: "Stirnbänder",
   legs: "Socken",
   shirts: "T-Shirts (leider nur für Hasen)"
 };
 
-const materialKeysVector = ["persons", "legs", "shirts"];
+const materialKeysVector = ["heads", "legs", "shirts"];
 const participantTypeKeysVector = ["rabbit", "cricket", "octopus"];
 
 const vectorToValues = keysVector => vector => Object.fromEntries(
@@ -39,9 +39,7 @@ const participantTypesToMatrix = participantTypes =>
   jStat(
     participantTypeKeysVector.map(participantType => {
       const requirements = participantTypes[participantType].requirements;
-      return materialKeysVector.map(material =>
-        material === "persons" ? 1 : requirements[material]
-      );
+      return materialKeysVector.map(material => requirements[material]);
     })
   ).transpose();
 
