@@ -74,10 +74,10 @@ const GuessCountsForm = props => {
   };
 
   return (
-    <form class="ui form" onSubmit={handleSubmit}>
-      <div class="fields">
+    <form className="ui form" onSubmit={handleSubmit}>
+      <div className="fields">
         {_.map(values, (count, material) => (
-          <div class="field" key={material}>
+          <div className="field" key={material}>
             <label>{materialNames[material]}</label>
             <input
               type="number"
@@ -91,7 +91,7 @@ const GuessCountsForm = props => {
           </div>
         ))}
       </div>
-      <button class="ui button" type="submit">
+      <button className="ui button" type="submit">
         Teilnehmer*innenzahlen erraten
       </button>
     </form>
@@ -131,21 +131,21 @@ const Tiergarten = props => {
     Math.pow(10, -decimals) * Math.round(Math.pow(10, decimals) * x);
   return (
     <>
-      <div class="ui card">
-        <div class="image">
-          <div class="tiergarten">{content}</div>
+      <div className="ui card">
+        <div className="image">
+          <div className="tiergarten">{content}</div>
         </div>
-        <div class="content">
-          <h2 class="header">Benötigte Materialien</h2>
+        <div className="content">
+          <h2 className="header">Benötigte Materialien</h2>
           {_.map(materialCounts, (count, material) => (
-            <div class="ui tiny horizontal statistic" key={material}>
-              <div class="value">{count}</div>
-              <div class="label">{materialNames[material]}</div>
+            <div className="ui tiny horizontal statistic" key={material}>
+              <div className="value">{count}</div>
+              <div className="label">{materialNames[material]}</div>
             </div>
           ))}
         </div>
-        <div class="content">
-          <h2 class="header">Materialien schon da?</h2>
+        <div className="content">
+          <h2 className="header">Materialien schon da?</h2>
           <GuessCountsForm
             materialCounts={materialCounts}
             updateValues={props.updateValues}
@@ -154,13 +154,15 @@ const Tiergarten = props => {
         </div>
       </div>
       <div className="ui card">
-        <div class="content">
+        <div className="content">
           <h2 className="header">Materialien-Matrix</h2>
           <table className="ui celled unstackable table">
             <thead>
               <tr>
-                {_.map(participantTypeKeysVector, (participantType, i) => (
-                  <th key={i}>je {participantTypes[participantType].label}</th>
+                {_.map(participantTypeKeysVector, participantType => (
+                  <th key={participantType}>
+                    je {participantTypes[participantType].label}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -175,7 +177,7 @@ const Tiergarten = props => {
             </tbody>
           </table>
         </div>
-        <div class="content">
+        <div className="content">
           <h2 className="header">Inverse Matrix</h2>
           <table className="ui celled unstackable table">
             <tbody>
