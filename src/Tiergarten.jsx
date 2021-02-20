@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { jStat } from "jstat";
+import _ from "lodash-es";
 
 const makeParticipantsForType = (participantType, count, typeConfig, props) =>
-  Array.from(Array(count).entries()).map(([key, __]) => (
+  _.range(count).map(key => (
     <a
       key={participantType + key}
       data-tooltip="entfernen"
@@ -22,17 +23,18 @@ const materialNames = {
 const materialKeysVector = ["heads", "legs", "shirts"];
 const participantTypeKeysVector = ["rabbit", "cricket", "octopus"];
 
-const vectorToValues = keysVector => vector => Object.fromEntries(
-  Array.from(keysVector.entries()).map(([i, key]) => [key, vector[i]])
-);
+const valuesToVector = keysVector => values =>
+  _.map(
+    keysVector,
+    key => [values[key]] // transpose for jstat multiply
+  );
 
-const valuesToVector = keysVector => values => jStat(keysVector.map(
-  key => values[key])).transpose();
-
-const materialsVectorToValues = vectorToValues(materialKeysVector);
+const materialsVectorToValues = vector =>
+  _.zipObject(materialKeysVector, vector);
 const valuesToMaterialsVector = valuesToVector(materialKeysVector);
 
-const participantsVectorToState = vectorToValues(participantTypeKeysVector);
+const participantsVectorToState = vector =>
+  _.zipObject(participantTypeKeysVector, vector);
 const stateToParticipantsVector = valuesToVector(participantTypeKeysVector);
 
 const participantTypesToMatrix = participantTypes =>
@@ -55,9 +57,7 @@ const guessCounts = (values, inverseMatrix) =>
 
 const GuessCountsForm = props => {
   const [values, setValues] = useState(() =>
-    Object.fromEntries(
-      Object.keys(materialNames).map(material => [material, ""])
-    )
+    _.fromPairs(_.map(materialKeysVector, material => [material, ""]))
   );
 
   const handleChange = event => {
@@ -76,7 +76,7 @@ const GuessCountsForm = props => {
   return (
     <form class="ui form" onSubmit={handleSubmit}>
       <div class="fields">
-        {Object.entries(values).map(([material, count]) => (
+        {_.map(values, (count, material) => (
           <div class="field" key={material}>
             <label>{materialNames[material]}</label>
             <input
@@ -110,31 +110,25 @@ const Tiergarten = props => {
   const participantTypes = props.config.participantTypes;
   console.log("mat", participantTypesToMatrix(participantTypes));
   const materialCounts = getMaterialCounts(props.state, participantTypes);
-  const participantPropsByType = Object.fromEntries(
-    participantTypeKeysVector.map(participantType => [
-      [participantType],
-      { onClick: props.handleDelete(participantType) },
-    ])
+  const participantPropsByType = _.mapValues(
+    participantTypes,
+    (_, participantType) => ({ onClick: props.handleDelete(participantType) })
   );
-  const participants = Object.entries(props.state).reduce(
-    (result, [participantType, count]) =>
-      result.concat(
-        makeParticipantsForType(
-          participantType,
-          count,
-          participantTypes[participantType],
-          participantPropsByType[participantType]
-        )
-      ),
-    []
+  console.log(participantPropsByType);
+  const participants = _.flatMap(props.state, (count, participantType) =>
+    makeParticipantsForType(
+      participantType,
+      count,
+      participantTypes[participantType],
+      participantPropsByType[participantType]
+    )
   );
   const content = participants.length ? participants : "leerer Tiergarten…";
   const requirementsMatrixJ = participantTypesToMatrix(participantTypes);
   const requirementsMatrix = requirementsMatrixJ.toArray();
   const inverseMatrix = jStat.inv(requirementsMatrixJ);
-  const roundAt = (x, decimals) => (
-    Math.pow(10, -decimals) * Math.round(Math.pow(10, decimals) * x)
-  );
+  const roundAt = (x, decimals) =>
+    Math.pow(10, -decimals) * Math.round(Math.pow(10, decimals) * x);
   return (
     <>
       <div class="ui card">
@@ -143,7 +137,7 @@ const Tiergarten = props => {
         </div>
         <div class="content">
           <h2 class="header">Benötigte Materialien</h2>
-          {Object.entries(materialCounts).map(([material, count]) => (
+          {_.map(materialCounts, (count, material) => (
             <div class="ui tiny horizontal statistic" key={material}>
               <div class="value">{count}</div>
               <div class="label">{materialNames[material]}</div>
@@ -163,19 +157,37 @@ const Tiergarten = props => {
         <div class="content">
           <h2 className="header">Materialien-Matrix</h2>
           <table className="ui celled unstackable table">
-            <thead><tr>{participantTypeKeysVector.map(participantType => (
-              <th>je {participantTypes[participantType].label}</th>
-            ))}</tr></thead>
-            <tbody>{ requirementsMatrix.map(row => (
-              <tr>{row.map(col => <td>{roundAt(col, 2)}</td>)}</tr>
-            )) }</tbody>
+            <thead>
+              <tr>
+                {_.map(participantTypeKeysVector, (participantType, i) => (
+                  <th key={i}>je {participantTypes[participantType].label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {_.map(requirementsMatrix, (row, i) => (
+                <tr key={i}>
+                  {_.map(row, (col, j) => (
+                    <td key={j}>{roundAt(col, 2)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
         <div class="content">
           <h2 className="header">Inverse Matrix</h2>
-          <table className="ui celled unstackable table"><tbody>{inverseMatrix.map(row => (
-            <tr>{row.map(col => <td>{roundAt(col, 2)}</td>)}</tr>
-          ))}</tbody></table>
+          <table className="ui celled unstackable table">
+            <tbody>
+              {_.map(inverseMatrix, (row, i) => (
+                <tr key={i}>
+                  {_.map(row, (col, j) => (
+                    <td key={j}>{roundAt(col, 2)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </>
